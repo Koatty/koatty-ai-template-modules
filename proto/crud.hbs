@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package pb;
+
+service {{pascalCase module}} {
+  rpc Get{{pascalCase module}}(Get{{pascalCase module}}Request) returns ({{pascalCase module}}Message) {}
+  rpc List{{pascalCase module}}(List{{pascalCase module}}Request) returns (List{{pascalCase module}}Reply) {}
+  rpc Create{{pascalCase module}}(Create{{pascalCase module}}Request) returns ({{pascalCase module}}Message) {}
+  rpc Update{{pascalCase module}}(Update{{pascalCase module}}Request) returns ({{pascalCase module}}Message) {}
+  rpc Delete{{pascalCase module}}(Delete{{pascalCase module}}Request) returns (Empty) {}
+}
+
+message Get{{pascalCase module}}Request {
+  int64 id = 1;
+}
+
+message List{{pascalCase module}}Request {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message List{{pascalCase module}}Reply {
+  repeated {{pascalCase module}}Message list = 1;
+  int64 total = 2;
+}
+
+message Create{{pascalCase module}}Request {
+  // 根据 fields 可扩展，此处使用 google.protobuf.Struct 或手动添加字段
+  map<string, string> data = 1;
+}
+
+message Update{{pascalCase module}}Request {
+  int64 id = 1;
+  map<string, string> data = 2;
+}
+
+message Delete{{pascalCase module}}Request {
+  int64 id = 1;
+}
+
+message {{pascalCase module}}Message {
+  int64 id = 1;
+  string name = 2;
+  // 可用 script 根据 fields 生成更多字段
+}
+
+message Empty {}

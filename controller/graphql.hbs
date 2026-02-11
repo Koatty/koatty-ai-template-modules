@@ -1,0 +1,41 @@
+import { GraphQLController, GetMapping, PostMapping, RequestParam, KoattyContext, Autowired{{#if auth.enabled}}, BeforeEach{{/if}} } from 'koatty';
+import { {{pascalCase module}}Service } from '../service/{{pascalCase module}}Service';
+
+{{#if auth.enabled}}
+@BeforeEach("AuthAspect")
+{{/if}}
+@GraphQLController('/graphql')
+export class {{pascalCase module}}GraphQLController {
+  @Autowired()
+  private {{camelCase module}}Service: {{pascalCase module}}Service;
+
+  ctx: KoattyContext;
+
+  constructor(ctx: KoattyContext) {
+    this.ctx = ctx;
+  }
+
+  @GetMapping()
+  async query(@RequestParam() args: { id?: number; page?: number; pageSize?: number }) {
+    if (args.id) {
+      return this.{{camelCase module}}Service.findById(args.id);
+    }
+    return this.{{camelCase module}}Service.findAll({ page: args.page, pageSize: args.pageSize } as any);
+  }
+
+  @PostMapping()
+  async mutation(@RequestParam() input: { action: string; data?: any }) {
+    if (input.action === 'create') {
+      return this.{{camelCase module}}Service.create(input.data || {});
+    }
+    if (input.action === 'update' && input.data?.id) {
+      const { id, ...dto } = input.data;
+      return this.{{camelCase module}}Service.update(id, dto);
+    }
+    if (input.action === 'delete' && input.data?.id) {
+      await this.{{camelCase module}}Service.{{#if features.softDelete}}softDelete{{else}}delete{{/if}}(input.data.id);
+      return { success: true };
+    }
+    throw new Error(`Unknown mutation: ${input.action}`);
+  }
+}

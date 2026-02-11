@@ -1,0 +1,38 @@
+import { GraphQLController, GetMapping, PostMapping, RequestParam, KoattyContext, Autowired } from 'koatty';
+import { {{baseClassName}}Service } from '../service/{{baseClassName}}Service';
+
+@GraphQLController('/graphql')
+export class {{className}} {
+  @Autowired()
+  private {{baseCamelName}}Service: {{baseClassName}}Service;
+
+  ctx: KoattyContext;
+
+  constructor(ctx: KoattyContext) {
+    this.ctx = ctx;
+  }
+
+  @GetMapping()
+  async query(@RequestParam() args: { id?: number; page?: number; pageSize?: number }) {
+    if (args.id) {
+      return this.{{baseCamelName}}Service.findById(args.id);
+    }
+    return this.{{baseCamelName}}Service.findAll({ page: args.page, pageSize: args.pageSize } as any);
+  }
+
+  @PostMapping()
+  async mutation(@RequestParam() input: { action: string; data?: any }) {
+    if (input.action === 'create') {
+      return this.{{baseCamelName}}Service.create(input.data || {});
+    }
+    if (input.action === 'update' && input.data?.id) {
+      const { id, ...dto } = input.data;
+      return this.{{baseCamelName}}Service.update(id, dto);
+    }
+    if (input.action === 'delete' && input.data?.id) {
+      await this.{{baseCamelName}}Service.delete(input.data.id);
+      return { success: true };
+    }
+    throw new Error(`Unknown mutation: ${input.action}`);
+  }
+}

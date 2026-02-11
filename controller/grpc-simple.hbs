@@ -1,0 +1,41 @@
+import { GrpcController, PostMapping, RequestBody, KoattyContext, Autowired } from 'koatty';
+import { {{baseClassName}}Service } from '../service/{{baseClassName}}Service';
+
+@GrpcController('/{{baseClassName}}')
+export class {{className}} {
+  @Autowired()
+  private {{baseCamelName}}Service: {{baseClassName}}Service;
+
+  ctx: KoattyContext;
+
+  constructor(ctx: KoattyContext) {
+    this.ctx = ctx;
+  }
+
+  @PostMapping('/Get{{baseClassName}}')
+  async get(@RequestBody() params: { id: number }) {
+    return this.{{baseCamelName}}Service.findById(params.id);
+  }
+
+  @PostMapping('/List{{baseClassName}}')
+  async list(@RequestBody() params: { page?: number; pageSize?: number }) {
+    return this.{{baseCamelName}}Service.findAll({ page: params.page, pageSize: params.pageSize } as any);
+  }
+
+  @PostMapping('/Create{{baseClassName}}')
+  async create(@RequestBody() params: any) {
+    return this.{{baseCamelName}}Service.create(params);
+  }
+
+  @PostMapping('/Update{{baseClassName}}')
+  async update(@RequestBody() params: { id: number } & any) {
+    const { id, ...dto } = params;
+    return this.{{baseCamelName}}Service.update(id, dto);
+  }
+
+  @PostMapping('/Delete{{baseClassName}}')
+  async remove(@RequestBody() params: { id: number }) {
+    await this.{{baseCamelName}}Service.delete(params.id);
+    return {};
+  }
+}

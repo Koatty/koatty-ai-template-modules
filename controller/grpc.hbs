@@ -1,0 +1,46 @@
+import { GrpcController, PostMapping, RequestBody, Validated, KoattyContext, Autowired{{#if auth.enabled}}, BeforeEach{{/if}} } from 'koatty';
+import { {{pascalCase module}}Service } from '../service/{{pascalCase module}}Service';
+
+{{#if auth.enabled}}
+@BeforeEach("AuthAspect")
+{{/if}}
+@GrpcController('/{{pascalCase module}}')
+export class {{pascalCase module}}GrpcController {
+  @Autowired()
+  private {{camelCase module}}Service: {{pascalCase module}}Service;
+
+  ctx: KoattyContext;
+
+  constructor(ctx: KoattyContext) {
+    this.ctx = ctx;
+  }
+
+  @PostMapping('/Get{{pascalCase module}}')
+  async get(@RequestBody() params: { id: number }) {
+    return this.{{camelCase module}}Service.findById(params.id);
+  }
+
+  @PostMapping('/List{{pascalCase module}}')
+  async list(@RequestBody() params: { page?: number; pageSize?: number }) {
+    return this.{{camelCase module}}Service.findAll({ page: params.page, pageSize: params.pageSize } as any);
+  }
+
+  @PostMapping('/Create{{pascalCase module}}')
+  @Validated()
+  async create(@RequestBody() params: any) {
+    return this.{{camelCase module}}Service.create(params);
+  }
+
+  @PostMapping('/Update{{pascalCase module}}')
+  @Validated()
+  async update(@RequestBody() params: { id: number } & any) {
+    const { id, ...dto } = params;
+    return this.{{camelCase module}}Service.update(id, dto);
+  }
+
+  @PostMapping('/Delete{{pascalCase module}}')
+  async remove(@RequestBody() params: { id: number }) {
+    await this.{{camelCase module}}Service.{{#if features.softDelete}}softDelete{{else}}delete{{/if}}(params.id);
+    return {};
+  }
+}
