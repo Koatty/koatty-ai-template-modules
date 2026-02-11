@@ -1,0 +1,11 @@
+import { Exception, ExceptionHandler, KoattyContext } from 'koatty';
+
+@ExceptionHandler()
+export class {{className}} extends Exception {
+  async handler(ctx: KoattyContext): Promise<any> {
+    ctx.status = this.status;
+    ctx.type = 'application/json';
+    const body = ctx.body ? JSON.stringify(ctx.body) : 'null';
+    ctx.res.end(`{"code": ${this.code}, "message": "${this.message || ctx.message}", "data": ${body}}`);
+  }
+}

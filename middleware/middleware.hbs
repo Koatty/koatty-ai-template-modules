@@ -1,0 +1,15 @@
+import { Middleware, KoattyContext, Koatty } from 'koatty';
+
+@Middleware()
+export class {{pascalCase module}}Middleware {
+  run(options: any, app: Koatty) {
+    return async (ctx: KoattyContext, next: Function) => {
+      // Pre-processing logic
+      console.log(`[{{pascalCase module}}Middleware] Request: ${ctx.path}`);
+
+      await next();
+
+      // Post-processing logic
+    };
+  }
+}

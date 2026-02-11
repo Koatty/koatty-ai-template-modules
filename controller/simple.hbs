@@ -1,0 +1,17 @@
+import { KoattyContext, Controller, Autowired, GetMapping } from 'koatty';
+import { App } from '{{subPath}}/App';
+
+@Controller('/{{lowerCase moduleName}}')
+export class {{className}} {
+  app: App;
+  ctx: KoattyContext;
+
+  constructor(ctx: KoattyContext) {
+    this.ctx = ctx;
+  }
+
+  @GetMapping('/')
+  index(): Promise<any> {
+    return this.ok('Hello, Koatty!');
+  }
+}

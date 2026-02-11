@@ -1,0 +1,15 @@
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import { Component } from 'koatty';
+import { App } from '{{subPath}}/App';
+
+@Component()
+@Entity('{{moduleName}}')
+export class {{className}} extends BaseEntity {
+  app: App;
+
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+}

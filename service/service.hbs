@@ -1,0 +1,64 @@
+import { Service, Autowired } from 'koatty';
+import { {{pascalCase module}}Model } from '../model/{{pascalCase module}}Model';
+import { Create{{pascalCase module}}Dto, Update{{pascalCase module}}Dto, Query{{pascalCase module}}Dto } from '../dto/{{pascalCase module}}Dto';
+
+@Service()
+export class {{pascalCase module}}Service {
+  @Autowired()
+  private {{camelCase module}}Model: {{pascalCase module}}Model;
+
+  /**
+   * 分页查询
+   */
+  async findAll(query: Query{{pascalCase module}}Dto) {
+    const { page = 1, pageSize = 10, ...filters } = query;
+    const [list, total] = await {{pascalCase module}}Model.findAndCount({
+      where: filters as any,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: { id: 'DESC' },
+    });
+    return { list, total, page, pageSize };
+  }
+
+  /**
+   * 根据 ID 查询
+   */
+  async findById(id: number) {
+    return {{pascalCase module}}Model.findOneBy({ id });
+  }
+
+  /**
+   * 创建
+   */
+  async create(dto: Create{{pascalCase module}}Dto) {
+    const entity = {{pascalCase module}}Model.create(dto as any);
+    return {{pascalCase module}}Model.save(entity);
+  }
+
+  /**
+   * 更新
+   */
+  async update(id: number, dto: Update{{pascalCase module}}Dto) {
+    await {{pascalCase module}}Model.update(id, dto as any);
+    return {{pascalCase module}}Model.findOneBy({ id });
+  }
+
+  /**
+   * 删除
+   */
+  async delete(id: number) {
+    return {{pascalCase module}}Model.delete(id);
+  }
+
+  {{#if features.softDelete}}
+  /**
+   * 软删除
+   */
+  async softDelete(id: number) {
+    return {{pascalCase module}}Model.softRemove(
+      await {{pascalCase module}}Model.findOneByOrFail({ id })
+    );
+  }
+  {{/if}}
+}

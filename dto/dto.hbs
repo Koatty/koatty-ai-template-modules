@@ -1,0 +1,98 @@
+import { IsString, IsNumber, IsBoolean, IsOptional, IsEnum, IsNotEmpty, MinLength, MaxLength, IsEmail, Min, Max, IsInt } from 'koatty_validation';
+
+/**
+ * 创建 DTO
+ */
+export class Create{{pascalCase module}}Dto {
+{{#each fields}}
+  {{#unless primary}}
+    {{#unless auto}}
+      {{#if required}}
+        @IsNotEmpty({ message: '{{@key}} 不能为空' })
+      {{/if}}
+      {{#if (eq type 'string')}}
+        @IsString({ message: '{{@key}} 必须是字符串' })
+        {{#if format}}
+          {{#if (eq format 'email')}}
+            @IsEmail({}, { message: '{{@key}} 必须是有效的邮箱地址' })
+          {{/if}}
+        {{/if}}
+        {{#if length}}
+          @MaxLength({{length}}, { message: '{{@key}} 长度不能超过 {{length}}' })
+        {{/if}}
+        {{#if minLength}}
+          @MinLength({{minLength}}, { message: '{{@key}} 长度不能少于 {{minLength}}' })
+        {{/if}}
+      {{/if}}
+      {{#if (eq type 'number')}}
+        @IsNumber({}, { message: '{{@key}} 必须是数字' })
+        {{#if min}}
+          @Min({{min}}, { message: '{{@key}} 不能小于 {{min}}' })
+        {{/if}}
+        {{#if max}}
+          @Max({{max}}, { message: '{{@key}} 不能大于 {{max}}' })
+        {{/if}}
+      {{/if}}
+      {{#if (eq type 'boolean')}}
+        @IsBoolean({ message: '{{@key}} 必须是布尔值' })
+      {{/if}}
+      {{#if (eq type 'enum')}}
+        @IsEnum([{{#each values}}'{{this}}'{{#unless @last}}, {{/unless}}{{/each}}], { message: '{{@key}} 必须是有效的枚举值' })
+      {{/if}}
+      {{#unless required}}
+        @IsOptional()
+      {{/unless}}
+      {{@key}}: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
+
+    {{/unless}}
+  {{/unless}}
+{{/each}}
+}
+
+/**
+ * 更新 DTO
+ */
+export class Update{{pascalCase module}}Dto {
+{{#each fields}}
+  {{#unless primary}}
+    {{#unless auto}}
+      {{#if (eq type 'string')}}
+        @IsString({ message: '{{@key}} 必须是字符串' })
+      {{/if}}
+      {{#if (eq type 'number')}}
+        @IsNumber({}, { message: '{{@key}} 必须是数字' })
+      {{/if}}
+      {{#if (eq type 'boolean')}}
+        @IsBoolean({ message: '{{@key}} 必须是布尔值' })
+      {{/if}}
+      @IsOptional()
+      {{@key}}?: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
+
+    {{/unless}}
+  {{/unless}}
+{{/each}}
+}
+
+/**
+ * 查询 DTO
+ */
+export class Query{{pascalCase module}}Dto {
+  @IsInt({ message: 'page 必须是整数' })
+  @Min(1, { message: 'page 不能小于 1' })
+  @IsOptional()
+  page?: number;
+
+  @IsInt({ message: 'pageSize 必须是整数' })
+  @Min(1, { message: 'pageSize 不能小于 1' })
+  @Max(100, { message: 'pageSize 不能大于 100' })
+  @IsOptional()
+  pageSize?: number;
+
+{{#each fields}}
+  {{#if searchable}}
+    @IsOptional()
+    {{@key}}?: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else}}string{{/if}};
+
+  {{/if}}
+{{/each}}
+}

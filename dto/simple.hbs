@@ -1,0 +1,11 @@
+import { Component } from 'koatty';
+import { IsNotEmpty, IsDefined } from 'koatty_validation';
+
+@Component()
+export class {{className}} {
+  @IsNotEmpty()
+  name: string;
+
+  @IsDefined()
+  memo?: string;
+}

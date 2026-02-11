@@ -1,0 +1,62 @@
+import { Component } from 'koatty';
+import {
+  Entity, Column, PrimaryGeneratedColumn,
+  CreateDateColumn, UpdateDateColumn,
+{{#if features.softDelete}}
+  DeleteDateColumn,
+{{/if}}
+  BaseEntity,
+} from 'typeorm';
+
+@Component()
+@Entity('{{#if table}}{{table}}{{else}}{{snakeCase module}}{{/if}}')
+export class {{pascalCase module}}Model extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+{{#each fields}}
+{{#unless primary}}
+  @Column({
+{{#if (eq type 'string')}}    type: 'varchar',
+{{/if}}
+{{#if (eq type 'number')}}    type: 'int',
+{{/if}}
+{{#if (eq type 'boolean')}}    type: 'boolean',
+{{/if}}
+{{#if (eq type 'datetime')}}    type: 'timestamp',
+{{/if}}
+{{#if (eq type 'text')}}    type: 'text',
+{{/if}}
+{{#if (eq type 'json')}}    type: 'json',
+{{/if}}
+{{#if (eq type 'decimal')}}    type: 'decimal', precision: 10, scale: 2,
+{{/if}}
+{{#if (eq type 'enum')}}    type: 'enum', enum: [{{#each values}}'{{this}}'{{#unless @last}}, {{/unless}}{{/each}}],
+{{/if}}
+{{#if unique}}    unique: true,
+{{/if}}
+{{#if nullable}}    nullable: true,
+{{else}}    nullable: false,
+{{/if}}
+{{#if length}}    length: {{length}},
+{{/if}}
+{{#if default}}    default: {{#if (eq type 'string')}}'{{default}}'{{else}}{{default}}{{/if}},
+{{/if}}
+{{#if comment}}    comment: '{{comment}}',
+{{/if}}
+  })
+  {{@key}}: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'datetime')}}Date{{else if (eq type 'decimal')}}number{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
+
+{{/unless}}
+{{/each}}
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+{{#if features.softDelete}}
+  @DeleteDateColumn()
+  deletedAt: Date;
+{{/if}}
+}

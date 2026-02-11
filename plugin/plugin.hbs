@@ -1,0 +1,19 @@
+import { Plugin, IPlugin, OnEvent, AppEvent, KoattyApplication } from 'koatty';
+import { App } from '{{subPath}}/App';
+
+@Plugin()
+export class {{className}} implements IPlugin {
+  run(options: any, app: App) {
+    // plugin initialization
+  }
+
+  @OnEvent(AppEvent.appReady)
+  async onReady(app: KoattyApplication) {
+    // execute after application is ready (e.g. service registration, connection pool init)
+  }
+
+  @OnEvent(AppEvent.appStop)
+  async onStop(app: KoattyApplication) {
+    // execute when application stops (e.g. cleanup resources)
+  }
+}

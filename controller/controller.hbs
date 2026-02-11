@@ -1,0 +1,69 @@
+import { Controller, GetMapping, PostMapping, PutMapping, DeleteMapping, PathVariable, RequestBody, Query as QueryParam, Autowired, KoattyContext{{#if auth.enabled}}, BeforeEach{{/if}} } from 'koatty';
+import { Validated } from 'koatty_validation';
+import { {{pascalCase module}}Service } from '../service/{{pascalCase module}}Service';
+import { Create{{pascalCase module}}Dto, Update{{pascalCase module}}Dto, Query{{pascalCase module}}Dto } from '../dto/{{pascalCase module}}Dto';
+
+{{#if auth.enabled}}
+@BeforeEach("AuthAspect")
+{{/if}}
+@Controller('{{#if api.basePath}}{{api.basePath}}{{else}}/{{lowerCase module}}{{/if}}')
+export class {{pascalCase module}}Controller {
+  @Autowired()
+  private {{camelCase module}}Service: {{pascalCase module}}Service;
+
+  ctx: KoattyContext;
+
+  constructor(ctx: KoattyContext) {
+    this.ctx = ctx;
+  }
+
+  /**
+   * 分页列表
+   */
+  @GetMapping('/')
+  async list(@QueryParam() query: Query{{pascalCase module}}Dto) {
+    const data = await this.{{camelCase module}}Service.findAll(query);
+    return this.ok(data);
+  }
+
+  /**
+   * 详情
+   */
+  @GetMapping('/:id')
+  async detail(@PathVariable('id') id: number) {
+    const data = await this.{{camelCase module}}Service.findById(id);
+    return this.ok(data);
+  }
+
+  /**
+   * 创建
+   */
+  @PostMapping('/')
+  @Validated()
+  async create(@RequestBody() dto: Create{{pascalCase module}}Dto) {
+    const data = await this.{{camelCase module}}Service.create(dto);
+    return this.ok(data);
+  }
+
+  /**
+   * 更新
+   */
+  @PutMapping('/:id')
+  @Validated()
+  async update(
+    @PathVariable('id') id: number,
+    @RequestBody() dto: Update{{pascalCase module}}Dto
+  ) {
+    const data = await this.{{camelCase module}}Service.update(id, dto);
+    return this.ok(data);
+  }
+
+  /**
+   * 删除
+   */
+  @DeleteMapping('/:id')
+  async remove(@PathVariable('id') id: number) {
+    await this.{{camelCase module}}Service.{{#if features.softDelete}}softDelete{{else}}delete{{/if}}(id);
+    return this.ok();
+  }
+}

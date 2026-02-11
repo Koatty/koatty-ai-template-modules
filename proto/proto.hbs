@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb;
+
+service {{className}} {
+  rpc SayHello(SayHelloRequest) returns (SayHelloReply) {}
+}
+
+message SayHelloRequest {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message SayHelloReply {
+  string message = 1;
+}

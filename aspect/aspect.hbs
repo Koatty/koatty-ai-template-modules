@@ -1,0 +1,34 @@
+import { Aspect, IAspect, KoattyContext } from 'koatty';
+import { App } from '{{subPath}}/App';
+
+@Aspect()
+export class {{pascalCase module}}Aspect implements IAspect {
+  app: App;
+
+  async run(args: any[], proceed?: Function, options?: any): Promise<any> {
+    // args:    目标方法参数数组
+    // proceed: @Around 模式下调用原方法; @Before/@After 模式下为 undefined
+    // options: { targetMethod: string, target: 被拦截的目标实例, ... }
+    //
+    // 注意区分：
+    //   this.app       — KoattyApplication 实例（全局单例）
+    //   options.target  — 被 AOP 拦截的目标实例（per-request）
+    //
+    // 获取当前请求上下文（仅当切面应用于 Controller 时可用）：
+    //   const ctx: KoattyContext = options?.target?.ctx;
+    //
+    //   ⚠️ 只有 Controller 实例拥有 ctx 属性。如果此切面应用于
+    //   Service、Component 等非 Controller 类，options.target 上
+    //   不存在 ctx，访问会返回 undefined。使用前请做判空检查。
+    //
+    // ctx 常用方法（需确认 ctx 存在）：
+    //   ctx.requestHeader(name?)       — 获取请求头
+    //   ctx.requestQuery(name?)        — 获取 query 参数
+    //   ctx.requestPathVariable(name?) — 获取路径参数
+    //   ctx.requestParam()             — 获取请求参数
+    //   ctx.requestBody()              — 获取请求体
+    //   ctx.requestFile(name?)         — 获取上传文件
+
+    return Promise.resolve();
+  }
+}

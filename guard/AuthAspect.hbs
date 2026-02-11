@@ -1,0 +1,60 @@
+import { Aspect, IAspect, KoattyContext } from 'koatty';
+import { App } from '../App';
+
+/**
+ * 认证切面
+ *
+ * 使用方式：
+ *   @Before("AuthAspect")  — 装饰需要认证的 Controller 方法
+ *   @BeforeEach("AuthAspect") — 装饰 Controller 类，所有方法生效
+ *
+ * run() 参数说明（由 koatty_container AOP 引擎传入）：
+ *   args    — 目标方法的参数数组（经参数装饰器解析后的值）
+ *   proceed — @Around 模式下调用原方法的函数；@Before 模式下为 undefined
+ *   options — { targetMethod: string, target: 被拦截的目标实例, ... }
+ *
+ * 注意区分：
+ *   this.app       — KoattyApplication 实例（全局单例）
+ *   options.target  — 被 AOP 拦截的目标实例（per-request）
+ *                    通过 options.target.ctx 可获取当前请求的 KoattyContext
+ *
+ * ⚠️ 只有 Controller 实例拥有 ctx 属性。如果此切面应用于
+ *   Service、Component 等非 Controller 类，options.target.ctx 不存在。
+ */
+@Aspect()
+export class AuthAspect implements IAspect {
+  app: App;
+
+  async run(args: any[], proceed?: Function, options?: any): Promise<any> {
+    const ctx: KoattyContext = options?.target?.ctx;
+    if (!ctx) {
+      throw new Error('Unauthorized: unable to get request context');
+    }
+
+    const token = ctx.requestHeader('Authorization')?.replace(/^Bearer\s+/i, '');
+    if (!token) {
+      throw new Error('Unauthorized: missing token');
+    }
+
+    // TODO: 替换为实际的 token 验证逻辑（JWT / session / OAuth 等）
+    try {
+      const payload = this.verifyToken(token);
+      // 将用户信息挂载到 ctx，后续 Controller / Service 可通过 ctx 获取
+      ctx.user = payload;
+    } catch {
+      throw new Error('Unauthorized: invalid token');
+    }
+
+    return Promise.resolve();
+  }
+
+  /**
+   * 验证 token — 请替换为项目实际实现
+   */
+  private verifyToken(token: string): { userId: number; roles: string[] } {
+    // 示例：简单解析，实际项目请使用 jsonwebtoken 等库
+    // import jwt from 'jsonwebtoken';
+    // return jwt.verify(token, process.env.JWT_SECRET) as any;
+    throw new Error('请实现 AuthAspect.verifyToken()');
+  }
+}
