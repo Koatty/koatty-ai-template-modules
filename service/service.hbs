@@ -1,11 +1,11 @@
-import { Service, Autowired } from 'koatty';
+import { Service } from 'koatty';
 import { {{pascalCase module}}Model } from '../model/{{pascalCase module}}Model';
-import { Create{{pascalCase module}}Dto, Update{{pascalCase module}}Dto, Query{{pascalCase module}}Dto } from '../dto/{{pascalCase module}}Dto';
+import { Create{{pascalCase module}}Dto } from '../dto/Create{{pascalCase module}}Dto';
+import { Update{{pascalCase module}}Dto } from '../dto/Update{{pascalCase module}}Dto';
+import { Query{{pascalCase module}}Dto } from '../dto/Query{{pascalCase module}}Dto';
 
 @Service()
 export class {{pascalCase module}}Service {
-  @Autowired()
-  private {{camelCase module}}Model: {{pascalCase module}}Model;
 
   /**
    * 分页查询

@@ -12,7 +12,7 @@ import {
 @Entity('{{#if table}}{{table}}{{else}}{{snakeCase module}}{{/if}}')
 export class {{pascalCase module}}Model extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
 {{#each fields}}
 {{#unless primary}}
@@ -45,18 +45,18 @@ export class {{pascalCase module}}Model extends BaseEntity {
 {{#if comment}}    comment: '{{comment}}',
 {{/if}}
   })
-  {{@key}}: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'datetime')}}Date{{else if (eq type 'decimal')}}number{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
+  {{@key}}!: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'datetime')}}Date{{else if (eq type 'decimal')}}number{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
 
 {{/unless}}
 {{/each}}
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
 {{#if features.softDelete}}
   @DeleteDateColumn()
-  deletedAt: Date;
+  deletedAt!: Date;
 {{/if}}
 }

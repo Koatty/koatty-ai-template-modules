@@ -1,4 +1,5 @@
-import { IsString, IsNumber, IsBoolean, IsOptional, IsEnum, IsNotEmpty, MinLength, MaxLength, IsEmail, Min, Max, IsInt } from 'koatty_validation';
+import { IsDefined } from 'koatty_validation';
+import { IsString, IsNumber, IsBoolean, IsOptional, IsIn, IsNotEmpty, MinLength, MaxLength, IsEmail, Min, Max, IsInt } from 'class-validator';
 
 /**
  * 创建 DTO
@@ -37,12 +38,13 @@ export class Create{{pascalCase module}}Dto {
         @IsBoolean({ message: '{{@key}} 必须是布尔值' })
       {{/if}}
       {{#if (eq type 'enum')}}
-        @IsEnum([{{#each values}}'{{this}}'{{#unless @last}}, {{/unless}}{{/each}}], { message: '{{@key}} 必须是有效的枚举值' })
+        @IsIn([{{#each values}}'{{this}}'{{#unless @last}}, {{/unless}}{{/each}}], { message: '{{@key}} 必须是有效的枚举值' })
       {{/if}}
       {{#unless required}}
         @IsOptional()
       {{/unless}}
-      {{@key}}: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
+      @IsDefined()
+      {{@key}}{{#if required}}!{{else}}?{{/if}}: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
 
     {{/unless}}
   {{/unless}}
@@ -58,6 +60,9 @@ export class Update{{pascalCase module}}Dto {
     {{#unless auto}}
       {{#if (eq type 'string')}}
         @IsString({ message: '{{@key}} 必须是字符串' })
+        {{#if length}}
+          @MaxLength({{length}}, { message: '{{@key}} 长度不能超过 {{length}}' })
+        {{/if}}
       {{/if}}
       {{#if (eq type 'number')}}
         @IsNumber({}, { message: '{{@key}} 必须是数字' })
@@ -65,8 +70,13 @@ export class Update{{pascalCase module}}Dto {
       {{#if (eq type 'boolean')}}
         @IsBoolean({ message: '{{@key}} 必须是布尔值' })
       {{/if}}
+      {{#if (eq type 'enum')}}
+        @IsIn([{{#each values}}'{{this}}'{{#unless @last}}, {{/unless}}{{/each}}])
+      {{/if}}
       @IsOptional()
-      {{@key}}?: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
+      @IsDefined()
+      @IsDefined()
+    {{@key}}?: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else if (eq type 'enum')}}{{#each values}}'{{this}}'{{#unless @last}} | {{/unless}}{{/each}}{{else}}string{{/if}};
 
     {{/unless}}
   {{/unless}}
@@ -80,17 +90,20 @@ export class Query{{pascalCase module}}Dto {
   @IsInt({ message: 'page 必须是整数' })
   @Min(1, { message: 'page 不能小于 1' })
   @IsOptional()
+  @IsDefined()
   page?: number;
 
   @IsInt({ message: 'pageSize 必须是整数' })
   @Min(1, { message: 'pageSize 不能小于 1' })
   @Max(100, { message: 'pageSize 不能大于 100' })
   @IsOptional()
+  @IsDefined()
   pageSize?: number;
 
 {{#each fields}}
   {{#if searchable}}
     @IsOptional()
+    @IsDefined()
     {{@key}}?: {{#if (eq type 'number')}}number{{else if (eq type 'boolean')}}boolean{{else}}string{{/if}};
 
   {{/if}}

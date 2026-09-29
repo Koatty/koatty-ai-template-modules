@@ -1,7 +1,9 @@
-import { Controller, GetMapping, PostMapping, PutMapping, DeleteMapping, PathVariable, RequestBody, Query as QueryParam, Autowired, KoattyContext{{#if auth.enabled}}, BeforeEach{{/if}} } from 'koatty';
+import { Controller, GetMapping, PostMapping, PutMapping, DeleteMapping, PathVariable, RequestBody, Get, Autowired, KoattyContext{{#if auth.enabled}}, BeforeEach{{/if}} } from 'koatty';
 import { Validated } from 'koatty_validation';
 import { {{pascalCase module}}Service } from '../service/{{pascalCase module}}Service';
-import { Create{{pascalCase module}}Dto, Update{{pascalCase module}}Dto, Query{{pascalCase module}}Dto } from '../dto/{{pascalCase module}}Dto';
+import { Create{{pascalCase module}}Dto } from '../dto/Create{{pascalCase module}}Dto';
+import { Update{{pascalCase module}}Dto } from '../dto/Update{{pascalCase module}}Dto';
+import { Query{{pascalCase module}}Dto } from '../dto/Query{{pascalCase module}}Dto';
 
 {{#if auth.enabled}}
 @BeforeEach("AuthAspect")
@@ -9,7 +11,7 @@ import { Create{{pascalCase module}}Dto, Update{{pascalCase module}}Dto, Query{{
 @Controller('{{#if api.basePath}}{{api.basePath}}{{else}}/{{lowerCase module}}{{/if}}')
 export class {{pascalCase module}}Controller {
   @Autowired()
-  private {{camelCase module}}Service: {{pascalCase module}}Service;
+  private {{camelCase module}}Service!: {{pascalCase module}}Service;
 
   ctx: KoattyContext;
 
@@ -21,9 +23,9 @@ export class {{pascalCase module}}Controller {
    * 分页列表
    */
   @GetMapping('/')
-  async list(@QueryParam() query: Query{{pascalCase module}}Dto) {
+  async list(@Get() query: Query{{pascalCase module}}Dto) {
     const data = await this.{{camelCase module}}Service.findAll(query);
-    return this.ok(data);
+    return data;
   }
 
   /**
@@ -32,30 +34,30 @@ export class {{pascalCase module}}Controller {
   @GetMapping('/:id')
   async detail(@PathVariable('id') id: number) {
     const data = await this.{{camelCase module}}Service.findById(id);
-    return this.ok(data);
+    return data;
   }
 
   /**
    * 创建
    */
   @PostMapping('/')
-  @Validated()
+  @Validated({ types: [Create{{pascalCase module}}Dto] })
   async create(@RequestBody() dto: Create{{pascalCase module}}Dto) {
     const data = await this.{{camelCase module}}Service.create(dto);
-    return this.ok(data);
+    return data;
   }
 
   /**
    * 更新
    */
   @PutMapping('/:id')
-  @Validated()
+  @Validated({ types: [Number, Update{{pascalCase module}}Dto] })
   async update(
     @PathVariable('id') id: number,
     @RequestBody() dto: Update{{pascalCase module}}Dto
   ) {
     const data = await this.{{camelCase module}}Service.update(id, dto);
-    return this.ok(data);
+    return data;
   }
 
   /**
@@ -64,6 +66,6 @@ export class {{pascalCase module}}Controller {
   @DeleteMapping('/:id')
   async remove(@PathVariable('id') id: number) {
     await this.{{camelCase module}}Service.{{#if features.softDelete}}softDelete{{else}}delete{{/if}}(id);
-    return this.ok();
+    return { success: true };
   }
 }
